@@ -29,28 +29,10 @@ class Table extends React.Component {
     super(props);
     this.state = {
       data: data,
-/*       sortedData: data.map(user => {
-        return { ...user, display: true}
-      }),
-      foundData: data.map(user => {
-        return { ...user, display: true}
-      }), */
       sort: {
-        id: '',
+        column: '',
         method: ''
       },
-/*       sortUp: {
-        id: false,
-        name: false,
-        date: false,
-        count: false,
-      },
-      sortDown: {
-        id: false,
-        name: false,
-        date: false,
-        count: false,
-      }, */
       search: {
         id: '',
         name: '',
@@ -100,18 +82,14 @@ class Table extends React.Component {
   }
 
   sortUp (id) {
-    /* const sortedData = this.state.data.slice().sort(this.compareFunction.bind(this, id, 1)); */
-
     this.setState({
-      sort: {id: id, method: 'up'}
+      sort: {column: id, method: 'up'}
     });
   }
 
   sortDown (id) {
-    /* const sortedData = this.state.data.slice().sort(this.compareFunction.bind(this, id, -1)); */
-
     this.setState({
-      sort: {id: id, method: 'down'}
+      sort: {column: id, method: 'down'}
     });
   }
 
@@ -122,23 +100,27 @@ class Table extends React.Component {
   }
 
   search (e, id) {
-    const searchResult = this.state.foundData.slice().filter(user => {
-      return new RegExp(e.target.value, 'i').test(user[id]);
-    });
-
     this.setState({
-      foundData: searchResult,
-      search: true
+      search: { ...this.state.search, [id]: e.target.value}
     });
   }
 
   render() {
-/*     const filteredData = this.state.sortedData.filter(user => {
-      return user.display;
-    }); */
-    const viewData = this.state.data;
+    const data = this.state.data.slice();
+    const sort = this.state.sort;
+    const search = this.state.search;
+    const sortModifier = sort.method === 'up' ? 1 : -1;
 
-    const table = viewData.map(user => {
+    const applySearch = user => {
+      for (let key in search) {
+        if (!new RegExp(search[key], 'i').test(user[key])) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    const renderUser = user => {
       return (
         <tr key={user.id}>
           <td>{user.id}</td>
@@ -146,7 +128,13 @@ class Table extends React.Component {
           <td>{user.date}</td>
           <td>{user.count}</td>
         </tr>);
-    });
+    }
+
+    let viewData = sort ? data.sort(this.compareFunction.bind(this, sort.column, sortModifier)) : data;
+
+    viewData = search ? viewData.filter(applySearch) : viewData;
+
+    const table = viewData.map(renderUser);
 
     return (
       <table className="modal-table">
