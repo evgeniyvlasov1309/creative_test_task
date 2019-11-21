@@ -10,6 +10,8 @@
 
 .modal--open {
   top: 50%;
+  z-index: 1;
+  background-color: whitesmoke;
 }
 
 .modal__text {
@@ -60,4 +62,16 @@ button {
 
 .button {
   padding: 0;
+}
+
+.modal__open {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  width: 200px;
+  height: 50px;
+  transform: translateX(-50%) translateY(-50%);
+  padding: 10px;
+  font-size: 24px;
+  border: none;
 }
